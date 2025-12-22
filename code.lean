@@ -20,11 +20,11 @@ def Split.Equiv (s : Split α h) (x y : α) : Prop :=
   s x = s y ∧ ∀ z, min x y ≤ z → z ≤ max x y → s z ≤ s x
 
 def IsRamsey (L : MultiplicativeLabelling S α) (s : Split α h) : Prop :=
-  ∀ x y : α, x < y → Split.Equiv s x y → ∃ e : S, IsIdempotent e ∧ L.σ x y = e
+  ∀ x y : α, x < y → Split.Equiv s x y → ∃ e : S, e * e = e ∧ L.σ x y = e
 
-def IsNormalized [Fintype α] [Nonempty α] [NeZero h] (s : Split α h) : Prop :=
+def IsNormalized [Fintype α] [Nonempty α] (s : Split α h) : Prop :=
   let min_a := Finset.min' Finset.univ Finset.univ_nonempty
-  s min_a = Fin.last (h - 1)
+  (s min_a : ℕ) = h - 1
 
 end definitions
 
@@ -40,7 +40,7 @@ variable {h : ℕ}
 theorem Split.is_equivalence (s : Split α h) : Equivalence (Split.Equiv s) := by
   sorry
 
-instance : NeZero (Fintype.card G) := ⟨Fintype.card_pos_iff.mpr ⟨1⟩⟩
+instance : NeZero (Fintype.card G) := NeZero.of_pos (Fintype.card_pos_iff.mpr ⟨(1 : G)⟩)
 
 theorem simon_group_case (σ : MultiplicativeLabelling G α) :
     ∃ (s : Split α (Fintype.card G)), IsNormalized s ∧ IsRamsey σ s := by
