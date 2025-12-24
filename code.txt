@@ -1,0 +1,47 @@
+import Mathlib.Algebra.Group.Basic
+import Mathlib.Order.Basic
+import Mathlib.Data.Fin.Basic
+import Mathlib.Data.Finset.Basic
+import Mathlib.Data.Finset.Max
+import Mathlib.Data.Fintype.Basic
+
+
+section definitions
+
+variable {S α : Type*} [Semigroup S] [LinearOrder α]
+
+variable {h : ℕ}
+
+structure MultiplicativeLabeling (S α : Type*) [Semigroup S] [LinearOrder α] where
+  σ: α → α → S
+  prop : ∀ x y z : α, x < y → y < z → σ x y * σ y z = σ x z
+
+def Split (α : Type*) (h : ℕ) := α → Fin h
+
+def SplitRelation (s : Split α h) (x y : α) : Prop :=
+  s x = s y ∧ ∀ z, min x y ≤  z → z ≤  max x y → s z ≤ s (min x y)
+
+def IsNormalized [Fintype α] [Nonempty α] (s : Split α h) : Prop :=
+  let min_α := Finset.min' Finset.univ Finset.univ_nonempty
+  some (s min_α) = Finset.max Finset.univ
+
+def IsRamsey (L : MultiplicativeLabeling S α) (s : Split α h) : Prop :=
+  ∀ x y : α, SplitRelation s x y → L.σ x y * L.σ x y = L.σ x y
+
+end definitions
+
+
+section theorems
+
+variable {G α : Type*} [Group G] [Fintype G] [DecidableEq G]
+
+variable [LinearOrder α] [Fintype α] [Nonempty α]
+
+theorem SplitRelation_Equiv (s : Split α h) : Equivalence (SplitRelation s) := by
+  sorry
+
+theorem simon_group_case (σ : MultiplicativeLabeling G α) :
+    ∃ (s : Split α (Fintype.card G)), IsNormalized s ∧ IsRamsey σ s := by
+  sorry
+
+end theorems
