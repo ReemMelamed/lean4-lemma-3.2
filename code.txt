@@ -19,7 +19,7 @@ structure MultiplicativeLabeling (S α : Type*) [Semigroup S] [LinearOrder α] w
 def Split (α : Type*) (h : ℕ) := α → Fin h
 
 def SplitRelation (s : Split α h) (x y : α) : Prop :=
-  s x = s y ∧ ∀ z, min x y ≤  z → z ≤  max x y → s z ≤ s (min x y)
+  s x = s y ∧ ∀ z, min x y ≤ z → z ≤ max x y → s z ≤ s (min x y)
 
 def IsNormalized [Fintype α] [Nonempty α] (s : Split α h) : Prop :=
   let min_α := Finset.min' Finset.univ Finset.univ_nonempty
