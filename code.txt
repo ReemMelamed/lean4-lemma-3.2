@@ -34,7 +34,7 @@ end definitions
 
 section theorems
 
-variable {G α : Type*} [Group G] [Fintype G] [DecidableEq G]
+variable {G α : Type*} [Group G] [Fintype G]
 
 variable [LinearOrder α]
 
@@ -90,7 +90,6 @@ theorem simon_group_case (σ : MultiplicativeLabeling G α) :
       rw [h_sx0, h_sy] at h_eq
       have h_map_1 : index_in_enum 1 = max_rank := by
         simp [index_in_enum]
-        rw [Equiv.swap_apply_left]
       
       rw [← h_map_1] at h_eq
       have h_val_1 : σ.σ x₀ y = 1 := Equiv.injective index_in_enum h_eq.symm
@@ -112,8 +111,9 @@ theorem simon_group_case (σ : MultiplicativeLabeling G α) :
       
       rw [← h_vals_eq] at h_mult
       have h_res : σ.σ x y = 1 := by
-        apply (mul_right_eq_self (a := σ.σ x₀ x)).mp
-        rw [h_mult]
+        have h_temp := congr_arg (fun g => (σ.σ x₀ x)⁻¹ * g) h_mult
+        simp at h_temp
+        exact h_temp
 
       simp [h_res]
 
