@@ -27,7 +27,7 @@ def isNormalized [Fintype α] [Nonempty α] (s : Split α h) : Prop :=
   some (s min_α) = Finset.max Finset.univ
 
 def isRamsey (L : MultiplicativeLabeling S α) (s : Split α h) : Prop :=
-  ∀ x y : α, splitRelation s x y → L.σ x y * L.σ x y = L.σ x y
+  ∀ x y : α, x<y → splitRelation s x y → L.σ x y * L.σ x y = L.σ x y
 
 end definitions
 
@@ -45,19 +45,26 @@ variable [Fintype α] [Nonempty α]
 
 theorem simon_group_case (σ : MultiplicativeLabeling G α) :
     ∃ (s : Split α (Fintype.card G)), isNormalized s ∧ isRamsey σ s := by
-  let n := Fintype.card G
+
+  let size_G := Fintype.card G
   let x₀ : α := Finset.min' (Finset.univ : Finset α) Finset.univ_nonempty
 
-  let max_idx : Fin n := Fin.last (n - 1)
-  let base_equiv := Fintype.equivFin G
-  let index_of := base_equiv.trans (Equiv.swap (base_equiv 1) max_idx)
 
-  have h_one_is_max : index_of 1 = max_idx := by
-    simp [index_of, Equiv.swap_apply_left]
+  have h_card_pos : 0 < size_G := Fintype.card_pos
+  have h_cast_lemma : size_G - 1 + 1 = size_G := Nat.sub_add_cancel h_card_pos
 
-  let s : Split α n := fun y =>
-    if y = x₀ then max_idx else index_of (σ.σ x₀ y)
+  let max_rank : Fin size_G := Fin.cast h_cast_lemma (Fin.last (size_G - 1))
 
+  let raw_equiv := Fintype.equivFin G
+  let index_in_enum := raw_equiv.trans (Equiv.swap (raw_equiv 1) max_rank)
+
+  have h_identity_is_top : index_in_enum 1 = max_rank := by
+    simp [index_in_enum, Equiv.swap_apply_left]
+
+  let s : Split α size_G := fun y =>
+    if y = x₀ then max_rank else index_in_enum (σ.σ x₀ y)
+
+  use s
 
 
 
