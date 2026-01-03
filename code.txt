@@ -59,9 +59,8 @@ theorem simon_group_case (σ : MultiplicativeLabeling G α) :
 
   let s : Split α size_G := fun y =>
     if y = x₀ then max_rank else index_in_enum (σ.σ x₀ y)
-
   use s
-
+  
   constructor
   · unfold isNormalized
     simp [s, x₀]
@@ -78,7 +77,6 @@ theorem simon_group_case (σ : MultiplicativeLabeling G α) :
   
   · unfold isRamsey
     sorry
-
 
 
 
