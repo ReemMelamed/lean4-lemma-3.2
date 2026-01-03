@@ -68,16 +68,54 @@ theorem simon_group_case (σ : MultiplicativeLabeling G α) :
     rw [Finset.max'_eq_iff]
     constructor
     · apply Finset.mem_univ
-    · intro y
+    · intro hy
       try intro _
       apply Fin.le_iff_val_le_val.mpr
       simp only [max_rank, Fin.val_cast, Fin.val_last]
       apply Nat.le_pred_of_lt
-      exact y.is_lt
+      exact hy.is_lt
   
   · unfold isRamsey
-    sorry
+    intros x y hlt hsr
+    unfold splitRelation at hsr
+    
+    by_cases hx : x = x₀
+    ·
+      subst hx
+      have h_eq : s x₀ = s y := hsr.left
+      have h_sx0 : s x₀ = max_rank := by simp [s]
+      have h_y_ne : y ≠ x₀ := ne_of_gt hlt
+      have h_sy : s y = index_in_enum (σ.σ x₀ y) := by simp [s, h_y_ne]
+      
+      rw [h_sx0, h_sy] at h_eq
+      have h_map_1 : index_in_enum 1 = max_rank := by
+        simp [index_in_enum]
+        rw [Equiv.swap_apply_left]
+      
+      rw [← h_map_1] at h_eq
+      have h_val_1 : σ.σ x₀ y = 1 := Equiv.injective index_in_enum h_eq.symm
+      simp [h_val_1]
 
+    ·
+      have h_x0_lt_x : x₀ < x := 
+        lt_of_le_of_ne (Finset.min'_le (Finset.univ : Finset α) x (Finset.mem_univ x)) (ne_comm.mp hx)
+      
+      have h_sx : s x = index_in_enum (σ.σ x₀ x) := by simp [s, ne_of_gt h_x0_lt_x]
+      have h_x0_lt_y : x₀ < y := lt_trans h_x0_lt_x hlt
+      have h_sy : s y = index_in_enum (σ.σ x₀ y) := by simp [s, ne_of_gt h_x0_lt_y]
+      
+      have h_s_eq : s x = s y := hsr.left
+      rw [h_sx, h_sy] at h_s_eq
+      
+      have h_vals_eq : σ.σ x₀ x = σ.σ x₀ y := Equiv.injective index_in_enum h_s_eq
+      have h_mult := σ.prop x₀ x y h_x0_lt_x hlt
+      
+      rw [← h_vals_eq] at h_mult
+      have h_res : σ.σ x y = 1 := by
+        apply (mul_right_eq_self (a := σ.σ x₀ x)).mp
+        rw [h_mult]
+
+      simp [h_res]
 
 
 end theorems
