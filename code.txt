@@ -22,9 +22,9 @@ abbrev Split (α : Type*) (h : ℕ) := α → Fin h
 def splitRelation (s : Split α h) (x y : α) : Prop :=
   s x = s y ∧ ∀ z, min x y ≤ z → z ≤ max x y → s z ≤ s (min x y)
 
-def isNormalized [Fintype α] [Nonempty α] (s : Split α h) : Prop :=
+def isNormalized [Fintype α] [Nonempty α] [Nonempty (Fin h)] (s : Split α h) : Prop :=
   let min_α := Finset.min' Finset.univ Finset.univ_nonempty
-  some (s min_α) = Finset.max Finset.univ
+  s min_α = Finset.max' Finset.univ Finset.univ_nonempty
 
 def isRamsey (L : MultiplicativeLabeling S α) (s : Split α h) : Prop :=
   ∀ x y : α, x<y → splitRelation s x y → L.σ x y * L.σ x y = L.σ x y
@@ -45,26 +45,40 @@ variable [Fintype α] [Nonempty α]
 
 theorem simon_group_case (σ : MultiplicativeLabeling G α) :
     ∃ (s : Split α (Fintype.card G)), isNormalized s ∧ isRamsey σ s := by
-
   let size_G := Fintype.card G
   let x₀ : α := Finset.min' (Finset.univ : Finset α) Finset.univ_nonempty
 
+  have h_size_pos : 0 < size_G := Fintype.card_pos
+  have h_size_cast : size_G - 1 + 1 = size_G := Nat.sub_add_cancel h_size_pos 
+  haveI : Nonempty (Fin size_G) := Fin.pos_iff_nonempty.mp h_size_pos
 
-  have h_card_pos : 0 < size_G := Fintype.card_pos
-  have h_cast_lemma : size_G - 1 + 1 = size_G := Nat.sub_add_cancel h_card_pos
-
-  let max_rank : Fin size_G := Fin.cast h_cast_lemma (Fin.last (size_G - 1))
+  let max_rank : Fin size_G := Fin.cast h_size_cast (Fin.last (size_G - 1))
 
   let raw_equiv := Fintype.equivFin G
   let index_in_enum := raw_equiv.trans (Equiv.swap (raw_equiv 1) max_rank)
-
-  have h_identity_is_top : index_in_enum 1 = max_rank := by
-    simp [index_in_enum, Equiv.swap_apply_left]
 
   let s : Split α size_G := fun y =>
     if y = x₀ then max_rank else index_in_enum (σ.σ x₀ y)
 
   use s
+
+  constructor
+    · unfold isNormalized
+      simp [s]
+      symm 
+      rw [Finset.max'_eq_iff]
+      constructor
+      · exact Finset.mem_univ _
+      · intro y _
+        apply Fin.le_iff_val_le_val.mpr
+        simp [max_rank]
+        apply Nat.le_of_lt_succ
+        rw [← h_size_cast]
+        exact y.is_lt
+    
+    · unfold isRamsey
+      sorry
+
 
 
 
