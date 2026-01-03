@@ -63,21 +63,21 @@ theorem simon_group_case (σ : MultiplicativeLabeling G α) :
   use s
 
   constructor
-    · unfold isNormalized
-      simp [s]
-      symm 
-      rw [Finset.max'_eq_iff]
-      constructor
-      · exact Finset.mem_univ _
-      · intro y _
-        apply Fin.le_iff_val_le_val.mpr
-        simp [max_rank]
-        apply Nat.le_of_lt_succ
-        rw [← h_size_cast]
-        exact y.is_lt
-    
-    · unfold isRamsey
-      sorry
+  · unfold isNormalized
+    simp [s, x₀]
+    symm 
+    rw [Finset.max'_eq_iff]
+    constructor
+    · apply Finset.mem_univ
+    · intro y
+      try intro _
+      apply Fin.le_iff_val_le_val.mpr
+      simp only [max_rank, Fin.val_cast, Fin.val_last]
+      apply Nat.le_pred_of_lt
+      exact y.is_lt
+  
+  · unfold isRamsey
+    sorry
 
 
 
